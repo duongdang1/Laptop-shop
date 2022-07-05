@@ -1,4 +1,7 @@
-﻿using e_commerce.Models;
+﻿using e_commerce.Data;
+using e_commerce.Data.Static;
+using e_commerce.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 public class DataSeeder
@@ -10,92 +13,79 @@ public class DataSeeder
                 DbContextOptions<ShopDbContext>>()))
         {
 
-            if (!shopDbContext.Users.Any())
+            
+
+            if (!shopDbContext.Products.Any())
             {
-                var User_List = new List<User>()
-                    {
-                        new User()
-                        {
-
-                            FirstName = "David",
-                            LastName = "D",
-                            Email = "davidd.com",
-                            Password = "1234"
-                        },
-
-                        new User()
-                        {
-
-                            FirstName = "Alex",
-                            LastName = "S",
-                            Email="alexs@gmail.com",
-                            Password="1234"
-                        }
-                    };
-                shopDbContext.Users.AddRange(User_List);
-                shopDbContext.SaveChanges();
-            }
-
-
-            if (!shopDbContext.Products.Any() && !shopDbContext.Sellers.Any())
-            {
-
-                var product1 = new Product()
+                shopDbContext.Products.AddRange(new List<Product>()
+                {
+                    new Product()
                 {
 
                     ProductName = "Macbook Pro 2022",
                     ProductImageUrl = "https://i.ibb.co/7nWnHc7/macbookpro.jpg",
                     ProductPrice = 2000.00
 
-                };
-                var product2 = new Product()
+                },
+                new Product()
                 {
 
                     ProductName = "Dell XPS",
                     ProductImageUrl = "https://i.ibb.co/KXxJsfM/dellxps.jpg",
                     ProductPrice = 1999.00
 
-                };
-                var seller1 = new Seller()
-                {
-
-                    SellerFirstName = "Da",
-                    SellerLastName = "Du",
-                    SellerEmail = "abcd@gmail.com",
-                    SellerPassword = "1234",
-                    SellerPhone = 1900,
-                    SellerReview = 5
-
-
-                };
-
-                var seller2 = new Seller()
-                {
-
-                    SellerFirstName = "Ng",
-                    SellerLastName = "Le",
-                    SellerEmail = "bcdez@gmail.com",
-                    SellerPassword = "1234",
-                    SellerPhone = 1800,
-                    SellerReview = 5
-
-                };
-
-
-                var pslist = new List<Product_Seller>()
-            {
-                new Product_Seller() { Product = product1, Seller = seller1 },
-                new Product_Seller() { Product = product1, Seller = seller2 },
-
-
-                new Product_Seller() { Product = product2, Seller = seller1 },
-
-            };
-                shopDbContext.Products_Sellers.AddRange(pslist);
-
+                }
+            });
                 shopDbContext.SaveChanges();
 
             }
         }
     }
+    public static async Task SeedUsersAndRolesAsync(IApplicationBuilder applicationBuilder)
+
+    {
+        using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
+        {
+            //Roles
+            var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            //Users
+            var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            string adminUserEmail = "admin@ecommerce.com";
+
+            var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
+            if (adminUser == null)
+            {
+                var newAdminUser = new ApplicationUser()
+                {
+                    Fullname = "Admin User",
+                    UserName = "admin-user",
+                    Email = adminUserEmail,
+                    EmailConfirmed = true
+                };
+                await userManager.CreateAsync(newAdminUser, "Coding@1234?");
+                await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
+            }
+
+            string appUserEmail = "admin@ecommerce.com";
+
+            var appUser = await userManager.FindByEmailAsync(appUserEmail);
+            if (appUser == null)
+            {
+                var newAppUser = new ApplicationUser()
+                {
+                    Fullname = "App User",
+                    UserName = "app-user",
+                    Email = appUserEmail,
+                    EmailConfirmed = true
+                };
+                await userManager.CreateAsync(newAppUser, "Coding@1234?");
+                await userManager.AddToRoleAsync(newAppUser, UserRoles.User);
+            }
+        }
+	}
 }

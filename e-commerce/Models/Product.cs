@@ -1,25 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using e_commerce.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using e_commerce.Models;
+using ecommerce.Data.Base;
 
-public class Product
+namespace e_commerce.Models
 {
-    public int ProductID { get; set; }
-    [Required]
-    [Display(Name = "Product Name" )]
-    public string? ProductName { get; set; }
-    [Required]
+    public class Product : IEntityBase
+    {
+        public int Id { get; set; }
+        public string? ProductName { get; set; }
+        public string? ProductImageUrl { get; set; }
 
-    [Display(Name = "Product Picture Url")]
-  
-    public string? ProductImageUrl { get; set; }
-
-    [Display(Name = "Product Price")]
-    public double ProductPrice { get; set; }
-    [ValidateNever]
-
-    //Relationships
-
-    public List<Product_Seller>? Products_Sellers { get; set; }
-
+        public double ProductPrice { get; set; }
+    }
 }
