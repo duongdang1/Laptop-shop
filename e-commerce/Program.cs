@@ -33,7 +33,10 @@ using (var scope = app.Services.CreateScope())
 
 
     DataSeeder.Initialize(services);
-}
+    
+} 
+
+DataSeeder.SeedUsersAndRolesAsync(app).Wait();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
