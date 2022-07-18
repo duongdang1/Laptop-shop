@@ -6,7 +6,7 @@ namespace e_commerce.Data.ViewModels
 	{
 		[Display(Name = "Full name")]
 		[Required(ErrorMessage ="Full name is required")]
-		public string? FullName { get; set; }
+		public string? Fullname { get; set; }
 
 		[Display(Name = "Email address")]
 		[Required(ErrorMessage = "Email address is required")]

@@ -1,4 +1,5 @@
-﻿using e_commerce.Data;
+﻿using Amazon.IdentityManagement.Model;
+using e_commerce.Data;
 using e_commerce.Data.Static;
 using e_commerce.Data.ViewModels;
 using e_commerce.Models;
@@ -7,6 +8,7 @@ using e_commerce.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +40,7 @@ namespace e_commerce.Controllers
 		[HttpPost]
         public async Task<IActionResult> Login(LoginVM loginVM)
 		{
-            if(ModelState.IsValid) return View(loginVM);
+            if(!ModelState.IsValid) return View(loginVM);
             var user = await _userManager.FindByEmailAsync(loginVM.EmailAddress);
                 if(user != null)
 			    {
@@ -49,7 +51,7 @@ namespace e_commerce.Controllers
                         var result = await _signInManager.PasswordSignInAsync(user, loginVM.Password, false, false);
                         if (result.Succeeded)
 					    {
-                            return RedirectToAction("Index", "Products");
+                            return RedirectToAction("Index", "Product");
 					    }
 
 				    }
@@ -68,32 +70,49 @@ namespace e_commerce.Controllers
         public async Task<IActionResult> Register(RegisterVM registerVM)
 		{
             if (!ModelState.IsValid) return View(registerVM);
+
             var user = await _userManager.FindByEmailAsync(registerVM.EmailAddress);
-            if(user != null)
-			{
+            if (user != null)
+            {
                 TempData["Error"] = "This email address is already in use";
                 return View(registerVM);
-			}
+            }
 
+            
             var newUser = new ApplicationUser()
             {
-                Fullname = registerVM.FullName,
+                Fullname = registerVM.Fullname,
                 Email = registerVM.EmailAddress,
-                UserName = registerVM.EmailAddress
+                UserName = registerVM.EmailAddress,
+                EmailConfirmed = true
+
             };
+
             var newUserResponse = await _userManager.CreateAsync(newUser, registerVM.Password);
-            if (newUserResponse.Succeeded)
-			{
-                await _userManager.AddToRoleAsync(newUser, UserRoles.User);
-			}
+
+            if (!newUserResponse.Succeeded)
+            {
+
+                foreach (var error in newUserResponse.Errors)
+                {
+                    TempData["Error"] = "error: " + error.Description;
+                    return View(registerVM);
+                }
+            }
+            
+            await _userManager.AddToRoleAsync(newUser, UserRoles.User);
             return View("RegisterCompleted");
-		}
+            
+           
+            
+
+        }
 
 		[HttpPost]
         public async Task<IActionResult> Logout()
 		{
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index","Products");
+            return RedirectToAction("Index","Product");
 		}
 
         public IActionResult AccessDenied(string ReturnUrl)

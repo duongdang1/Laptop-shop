@@ -71,7 +71,7 @@ public class DataSeeder
                 await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
             }
 
-            string appUserEmail = "admin@ecommerce.com";
+            string appUserEmail = "user@ecommerce.com";
 
             var appUser = await userManager.FindByEmailAsync(appUserEmail);
             if (appUser == null)

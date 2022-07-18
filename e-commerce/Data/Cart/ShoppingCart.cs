@@ -16,9 +16,8 @@ namespace e_commerce.Data.Cart
 
         public static ShoppingCart GetShoppingCart(IServiceProvider services)
         {
-            ISession session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext.Session;
+            ISession? session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext.Session;
             var context = services.GetService<ShopDbContext>();
-
             string cartId = session.GetString("CartId") ?? Guid.NewGuid().ToString();
             session.SetString("CartId", cartId);
 

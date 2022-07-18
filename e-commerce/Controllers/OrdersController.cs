@@ -31,7 +31,7 @@ namespace eTickets.Controllers
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             string userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var orders = await _ordersService.GetOrderByUserIdAndRoleAsync(userId, userRole);
+            var orders = await _ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
             return View(orders);
         }
 

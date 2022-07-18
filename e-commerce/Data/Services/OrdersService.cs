@@ -12,10 +12,12 @@ namespace e_commerce.Data.Services
             _context = context;
         }
 
-        public async Task<List<Order>> GetOrderByUserIdAndRoleAsync(string userId, string userRole)
+        public async Task<List<Order>> GetOrdersByUserIdAndRoleAsync(string userId, string userRole)
         {
-            var orders = await _context.Orders.Include(n => n.OrderItems).ThenInclude(n => n.Product).Include(n => n.User).ToListAsync();
-            if(userRole != "Admin")
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            var orders = await _context.Orders.Include(n => n.OrderItems).ThenInclude(n => n.Product).ToListAsync();
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            if (userRole != "Admin")
             {
                 orders = orders.Where(n => n.UserId == userId).ToList();
             }
@@ -36,7 +38,7 @@ namespace e_commerce.Data.Services
                 var orderItem = new OrderItem()
                 {
                     Amount = item.Amount,
-                    ProductID = item.Product.Id,
+                    ProductId = item.Product.Id,
                     OrderId = order.Id,
                     Price = item.Product.ProductPrice
                 };

@@ -12,8 +12,8 @@ namespace e_commerce.Models
 
         public double Price { get; set; }
 
-        public int ProductID { get; set; }
-        [ForeignKey("ProductID")]
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
 
         public Product? Product { get; set; }
 
