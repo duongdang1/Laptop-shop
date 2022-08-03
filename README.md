@@ -19,7 +19,7 @@ This is a fullstack e-commerce application that built on ASP.NET Core MVC 6.
 
 
 ## Built With
-
+- Backend with MySql
 - ASP.NET Core MVC 6
 - C#
 
